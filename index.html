@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Test</title>
+		<script src="id.js"></script>
+		<script src="pako.min.js"></script>
+		<script src="schematictomcfunction.js"></script>
+		<style type="text/css">
+			.GenerateForm{display: none;}
+		</style>
+	</head>
+
+	<body>
+		<input type="file" id="files" name="files[]" multiple>
+		<div id="output"></div>
+
+		<div class="GenerateForm">
+			<label for="Selector">Селектор</label>
+			<input type="text" id="Selector">
+		</div>
+		<div class="GenerateForm">
+			<label for="BuildAir">Строить воздух</label>
+			<input type="checkbox" id="BuildAir">
+		</div>
+		<div class="GenerateForm">
+			<button id="GenerateButton" onclick="if(generator()) document.getElementById('DownloadMcfunctionLink').click()">генерировать</button>
+		</div>
+		<div class="GenerateForm" id="GenerateFormOutput"></div>
+
+		<div id="DownloadMcfunction" style="display:none;">
+			<a href="" id="DownloadMcfunctionLink">Сохранить файл</a>
+		</div>
+
+		<script>
+			document.getElementById('files').addEventListener('change', receivingFile, false);
+		</script>
+	</body>
+</html>
