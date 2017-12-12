@@ -1,13 +1,9 @@
 /*
-
 	Copyright © 2017 Siverus production
-	Author: Andrey Trokhlebov (Siv)
-
-	Условия использования ПО: Автор разрешает использовать данный код для ознакомления и личного использования. Так же автор не дает разрешение на публикацию, распространение, сублиценизрование и продажу данного ПО. При нарушении приведенных условий использования данного ПО, нарушитель признается Пидором. 
-
+	Author: Andrey Trokhlebov (Siv)	
 */
 
-//Мутим конструктор и объявляем массив для хранения всей необходимой инфы о блоках
+//Мутим конструктор и объявляем глобальный массив для хранения всей необходимой инфы о блоках и строку для хранения имени файла
 function Block (InputId, InputData)
 {
 	this.Id = InputId;
@@ -27,7 +23,7 @@ else
   alert('The File APIs are not fully supported in this browser.');
 }
 
-//Обработка получения файла
+//Принимаем файл
  function receivingFile(evt)
  {
     var files = evt.target.files;
@@ -37,27 +33,30 @@ else
     //обрабатываем получение файла
     reader.onload = function()
     {
-    	var Elements = document.getElementsByClassName('GenerateForm');
+    	//document.getElementById('files-label').innerHTML = '<strong>Выбрать другой</strong>';
     	if(handlingFile(reader.result))
     	{
     		document.getElementById('output').innerHTML = "Schematic успешно прочитан";
     		document.getElementById('output').style.color = '#2ead20';
-    		for (var i = 0; i < Elements.length; i++) Elements[i].style.display = 'block';
+    		//$('#GenerateForm').fadeIn(500);
+    		document.getElementById('GenerateForm').style.display = 'block';
     		FileName = evt.target.files[0].name.split('.')[0];
     	}
     	else
     	{
     		document.getElementById('output').innerHTML = "Какой-то странный schematic";
     		document.getElementById('output').style.color = '#e52d2d';
-    		for (var i = 0; i < Elements.length; i++) Elements[i].style.display = 'none';
-
+    		//$('#GenerateForm').fadeOut(100);
+    		document.getElementById('GenerateForm').style.display = 'none';
     	}
     }
 }
 
-//Обработка файла и заполнение Blocks
+//обрабатываем файл и заполняем Blocks
 function handlingFile(FileContent)
 {
+	//document.getElementById('output').innerHTML = FileContent.length; //длина входящего массива байтов
+
 	//распаковываем файл и мутим для его содержимого строковую версию
 	var FileData;
 	try
@@ -68,7 +67,9 @@ function handlingFile(FileContent)
 	{
 		return false;
 	}
-	var StrFileData = String.fromCharCode.apply(null, FileData);
+	var StrFileData = new TextDecoder("utf-8").decode(FileData);
+
+	//document.getElementById('output').innerHTML += "   " + FileData.length; //длина массива распакованных байтов
 
 	//объявляем переменные для всей инфы, которую надо взять из файла
 
@@ -91,7 +92,17 @@ function handlingFile(FileContent)
 		if(Index == -1)
 		{
 			console.log('Тег ',TAGS[i],' не найден.');
-			return false;
+			switch(i)
+			{
+				case 0:
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+					return 0;
+				default:
+					continue;
+			}
 		}
 		else
 		{
@@ -102,8 +113,9 @@ function handlingFile(FileContent)
 			{
 				case 'Blocks':
 				case 'Data':
+					//console.log('Индекс ', Index);
 					var ArrSize = byteToNum(FileData.slice(Index, Index+4));
-					console.log('Длина массива Blocks: ', ArrSize);
+					console.log('Длина массива', TAGS[i], ': ', ArrSize);
 					Index += 4;
 
 					for (var j = 0; j < ArrSize; j++)
@@ -165,25 +177,35 @@ function generator()
 {
 	document.getElementById('DownloadMcfunction').style.display = 'none';
 
-	//считываем и валидируем селектор
-	var Selector = document.getElementById('Selector').value;
-	if (Selector == '')
+	//считываем исполнителя функции
+	var Performer = document.getElementById('Performer');
+	Performer = Performer.options[Performer.selectedIndex].index;
+	console.log('Исполнитель: ', Performer);
+
+	//Если исполнитель - сущность 
+	if(Performer == 1)
 	{
-		document.getElementById('GenerateFormOutput').innerHTML = 'Селектор нужно заполнить. Например, "@s"';
-		return 0;
-	}
-	else
-	{
-		if(Selector[0] != '@' || (Selector[1] != 'a' && Selector[1] != 'p' && Selector[1] != 'e' && Selector[1] != 's' && Selector[1] != 'r'))
+		//считываем и валидируем селектор
+		var Selector = document.getElementById('Selector').value;
+		if (Selector == '')
 		{
-			document.getElementById('GenerateFormOutput').innerHTML = "Это не селектор";
+			document.getElementById('GenerateFormOutput').innerHTML = 'Селектор нужно заполнить. Например, "@s"';
 			return 0;
 		}
-		else document.getElementById('GenerateFormOutput').innerHTML = "";
+		else
+		{
+			if(Selector[0] != '@' || (Selector[1] != 'a' && Selector[1] != 'p' && Selector[1] != 'e' && Selector[1] != 's' && Selector[1] != 'r'))
+			{
+				document.getElementById('GenerateFormOutput').innerHTML = "Это не селектор";
+				return 0;
+			}
+			else document.getElementById('GenerateFormOutput').innerHTML = "";
+		}
+		console.log('Selector: ' + Selector);
 	}
-	console.log('Selector: ' + Selector);
 
 	//считываем параметр строительства воздуха
+
 	var BuildAir = document.getElementById('BuildAir').checked;
 	console.log('BuildAir: ' + BuildAir);
 
@@ -194,7 +216,8 @@ function generator()
 		if(Blocks[i].Id == 0 && !BuildAir) continue;
 		else
 		{
-			var Command = 'execute ' + Selector + ' ~ ~ ~ setblock ~' + Blocks[i].X + ' ~' + Blocks[i].Y + ' ~' + Blocks[i].Z + ' ' + StringIds[Blocks[i].Id] + ' ' + Blocks[i].Data + '\n';
+			if(Performer == 0) var Command = 'setblock ~' + Blocks[i].X + ' ~' + Blocks[i].Y + ' ~' + Blocks[i].Z + ' ' + StringIds[Blocks[i].Id] + ' ' + Blocks[i].Data + '\n';
+			else var Command = 'execute ' + Selector + ' ~ ~ ~ setblock ~' + Blocks[i].X + ' ~' + Blocks[i].Y + ' ~' + Blocks[i].Z + ' ' + StringIds[Blocks[i].Id] + ' ' + Blocks[i].Data + '\n';
 			Commands += Command;
 		}
 	}
@@ -208,9 +231,10 @@ function generator()
 	return true;
 }
 
-//хуйня для преобразования нескольких байт в num
+//немного странная хуйня для преобразования нескольких байт в num
 function byteToNum(ByteArray)
 {
+	//console.log(ByteArray);
     var Value = 0;
     if(ByteArray[0] < 128)
 	    for ( var i = 0; i < ByteArray.length; i++)

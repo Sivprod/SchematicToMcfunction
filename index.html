@@ -7,27 +7,34 @@
 		<script src="id.js"></script>
 		<script src="pako/pako.min.js"></script>
 		<script src="schematictomcfunction.js"></script>
-		<style type="text/css">
-			.GenerateForm{display: none;}
-		</style>
 	</head>
 
 	<body>
 		<input type="file" id="files" name="files[]" multiple>
 		<div id="output"></div>
 
-		<div class="GenerateForm">
-			<label for="Selector">Селектор</label>
-			<input type="text" id="Selector">
+		<div id="GenerateForm" style="display:none;">
+			<label for="Performer">Исполнитель команды</label>
+			<select id="Performer" onchange="
+				if (this.options[this.selectedIndex].index == 1) document.getElementById('SelectorBlock').style.display = 'block';
+				else document.getElementById('SelectorBlock').style.display = 'none';
+			">
+				<option>Командный блок</option>
+				<option>Сущность</option>
+			</select>
+			<div id="SelectorBlock" style="display:none">
+				<label for="Selector">Селектор</label>
+				<input type="text" id="Selector">
+				<div class="GenerateForm" id="GenerateFormOutput"></div>
+			</div>
+			<div>
+				<label for="BuildAir">Строить воздух</label>
+				<input type="checkbox" id="BuildAir">
+			</div>
+			<div>
+				<button id="GenerateButton" onclick="if(generator()) document.getElementById('DownloadMcfunctionLink').click()">генерировать</button>
+			</div>
 		</div>
-		<div class="GenerateForm">
-			<label for="BuildAir">Строить воздух</label>
-			<input type="checkbox" id="BuildAir">
-		</div>
-		<div class="GenerateForm">
-			<button id="GenerateButton" onclick="if(generator()) document.getElementById('DownloadMcfunctionLink').click()">генерировать</button>
-		</div>
-		<div class="GenerateForm" id="GenerateFormOutput"></div>
 
 		<div id="DownloadMcfunction" style="display:none;">
 			<a href="" id="DownloadMcfunctionLink">Сохранить файл</a>
