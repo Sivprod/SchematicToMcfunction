@@ -55,8 +55,6 @@ else
 //обрабатываем файл и заполняем Blocks
 function handlingFile(FileContent)
 {
-	//document.getElementById('output').innerHTML = FileContent.length; //длина входящего массива байтов
-
 	//распаковываем файл и мутим для его содержимого строковую версию
 	var FileData;
 	try
@@ -67,9 +65,8 @@ function handlingFile(FileContent)
 	{
 		return false;
 	}
-	var StrFileData = new TextDecoder("utf-8").decode(FileData);
-
-	//document.getElementById('output').innerHTML += "   " + FileData.length; //длина массива распакованных байтов
+	//var StrFileData = new TextDecoder("utf-8").decode(FileData);
+	var StrFileData = String.fromCharCode.apply(null, FileData);
 
 	//объявляем переменные для всей инфы, которую надо взять из файла
 
@@ -231,23 +228,11 @@ function generator()
 	return true;
 }
 
-//немного странная хуйня для преобразования нескольких байт в num
-function byteToNum(ByteArray)
+//преобразование нескольких байт в num
+function byteToNum( ByteArray )
 {
-	//console.log(ByteArray);
-    var Value = 0;
-    if(ByteArray[0] < 128)
-	    for ( var i = 0; i < ByteArray.length; i++)
-	    {
-	        Value = (Value * 256) + ByteArray[i];
-	    }
-    else
-    {
-    	for ( var i = 0; i < ByteArray.length; i++)
-	    {
-	        Value = (Value * 256) - (255-ByteArray[i]);
-	    }
-	    Value--;
-	}
-    return Value;
-};
+  var result = (ByteArray[0] & 0x80) ? -1 : 0;
+  for (var i=0; i < ByteArray.length; i++)
+     result = (result << 8) | (ByteArray[i] & 0xff); 
+  return result;
+}﻿
