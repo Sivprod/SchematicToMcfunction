@@ -1,8 +1,3 @@
-/*
-	Copyright © 2017 Siverus production
-	Author: Andrey Trokhlebov (Siv)	
-*/
-
 //Мутим конструктор и объявляем глобальный массив для хранения всей необходимой инфы о блоках и строку для хранения имени файла
 function Block (InputId, InputData)
 {
@@ -36,15 +31,15 @@ else
     	//document.getElementById('files-label').innerHTML = '<strong>Выбрать другой</strong>';
     	if(handlingFile(reader.result))
     	{
-    		document.getElementById('output').innerHTML = "Schematic успешно прочитан";
-    		document.getElementById('output').style.color = '#2ead20';
+    		document.getElementById('output').innerHTML = "Schematic succesfully uploaded!";
+    		document.getElementById('output').style.color = '#2fad20';
     		//$('#GenerateForm').fadeIn(500);
     		document.getElementById('GenerateForm').style.display = 'block';
     		FileName = evt.target.files[0].name.split('.')[0];
     	}
     	else
     	{
-    		document.getElementById('output').innerHTML = "Какой-то странный schematic";
+    		document.getElementById('output').innerHTML = "Invalid format schematic, Needs to be .schematic";
     		document.getElementById('output').style.color = '#e52d2d';
     		//$('#GenerateForm').fadeOut(100);
     		document.getElementById('GenerateForm').style.display = 'none';
@@ -88,7 +83,7 @@ function handlingFile(FileContent)
 		Index = StrFileData.indexOf(TAGS[i]);
 		if(Index == -1)
 		{
-			console.log('Тег ',TAGS[i],' не найден.');
+			console.log('Ter ',TAGS[i],' Not Found');
 			switch(i)
 			{
 				case 0:
@@ -103,7 +98,7 @@ function handlingFile(FileContent)
 		}
 		else
 		{
-			console.log('Тег ',TAGS[i],' найден на позиции ', Index);
+			console.log('Ter ',TAGS[i],' Found in position ', Index);
 			Index += TAGS[i].length;
 
 			switch(TAGS[i])
@@ -112,7 +107,7 @@ function handlingFile(FileContent)
 				case 'Data':
 					//console.log('Индекс ', Index);
 					var ArrSize = byteToNum(FileData.slice(Index, Index+4));
-					console.log('Длина массива', TAGS[i], ': ', ArrSize);
+					console.log('Array length', TAGS[i], ': ', ArrSize);
 					Index += 4;
 
 					for (var j = 0; j < ArrSize; j++)
@@ -177,7 +172,7 @@ function generator()
 	//считываем исполнителя функции
 	var Performer = document.getElementById('Performer');
 	Performer = Performer.options[Performer.selectedIndex].index;
-	console.log('Исполнитель: ', Performer);
+	console.log('Performer', Performer);
 
 	//Если исполнитель - сущность 
 	if(Performer == 1)
@@ -186,14 +181,14 @@ function generator()
 		var Selector = document.getElementById('Selector').value;
 		if (Selector == '')
 		{
-			document.getElementById('GenerateFormOutput').innerHTML = 'Селектор нужно заполнить. Например, "@s"';
+			document.getElementById('GenerateFormOutput').innerHTML = 'The selector needs to be filled. For example, "@s"';
 			return 0;
 		}
 		else
 		{
 			if(Selector[0] != '@' || (Selector[1] != 'a' && Selector[1] != 'p' && Selector[1] != 'e' && Selector[1] != 's' && Selector[1] != 'r'))
 			{
-				document.getElementById('GenerateFormOutput').innerHTML = "Это не селектор";
+				document.getElementById('GenerateFormOutput').innerHTML = "This is not a selector";
 				return 0;
 			}
 			else document.getElementById('GenerateFormOutput').innerHTML = "";
@@ -213,8 +208,8 @@ function generator()
 		if(Blocks[i].Id == 0 && !BuildAir) continue;
 		else
 		{
-			if(Performer == 0) var Command = 'setblock ~' + Blocks[i].X + ' ~' + Blocks[i].Y + ' ~' + Blocks[i].Z + ' ' + StringIds[Blocks[i].Id] + ' ' + Blocks[i].Data + '\n';
-			else var Command = 'execute ' + Selector + ' ~ ~ ~ setblock ~' + Blocks[i].X + ' ~' + Blocks[i].Y + ' ~' + Blocks[i].Z + ' ' + StringIds[Blocks[i].Id] + ' ' + Blocks[i].Data + '\n';
+			if(Performer == 0) var Command = 'setblock ~' + Blocks[i].X + ' ~' + Blocks[i].Y + ' ~' + Blocks[i].Z + ' ' + StringIds[Blocks[i].Id] + ' ' + '\n';
+			else var Command = 'execute at ' + Selector + ' run setblock ~' + Blocks[i].X + ' ~' + Blocks[i].Y + ' ~' + Blocks[i].Z + ' ' + StringIds[Blocks[i].Id] + ' ' + '\n';
 			Commands += Command;
 		}
 	}
@@ -224,7 +219,7 @@ function generator()
 	var Link = document.getElementById('DownloadMcfunctionLink');
 	Link.href = URL.createObjectURL(File);
 	Link.download = FileName + '.mcfunction';
-	console.log('Заебись');
+	console.log('Fuck you');
 	return true;
 }
 
@@ -235,4 +230,4 @@ function byteToNum( ByteArray )
   for (var i=0; i < ByteArray.length; i++)
      result = (result << 8) | (ByteArray[i] & 0xff); 
   return result;
-}﻿
+}
